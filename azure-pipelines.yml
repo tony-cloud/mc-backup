@@ -34,12 +34,6 @@ steps:
     failOnStdErr: false
     readyTimeout: '20000'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'publish artifact'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-
 - task: GitHubRelease@1
   inputs:
     gitHubConnection: 'tcrelease'
