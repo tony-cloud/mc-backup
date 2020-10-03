@@ -22,7 +22,7 @@ steps:
 - task: CmdLine@2
   displayName: 'download backup file'
   inputs:
-    script: 'wget https://ws36.tc0.in/backupHelper/backup.tar.gz'
+    script: 'wget https://ws36.tc0.in/backupHelper/worlds.tar.gz'
     workingDirectory: '$(Build.ArtifactStagingDirectory)'
 
 - task: SSH@0
