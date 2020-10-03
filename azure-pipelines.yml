@@ -48,7 +48,7 @@ steps:
     target: '$(Build.SourceVersion)'
     tagSource: 'userSpecifiedTag'
     tag: '$(Build.SourceBranchName)-$(Build.SourceVersion)'
-    title: '$(name)'
+    title: '$(System.date:yyyyMMddHHmmss)'
     releaseNotesSource: 'inline'
     releaseNotesInline: |
       Build by azure pipeline automatically.
