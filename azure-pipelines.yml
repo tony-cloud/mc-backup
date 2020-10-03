@@ -16,7 +16,7 @@ steps:
   inputs:
     sshEndpoint: 's36-ssh'
     runOptions: 'commands'
-    commands: 'cd /usr/local/mcsmanager/backupHelper;./backup_world.sh bedrock_server'
+    commands: '/usr/local/mcsmanager/backupHelper/backup_world.sh bedrock_server'
     readyTimeout: '20000'
 
 - task: CmdLine@2
