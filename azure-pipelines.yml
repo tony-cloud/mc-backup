@@ -2,6 +2,7 @@
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
+name: mcs36_$(date:yyyyMMddHHmmss)
 
 trigger:
 - master
@@ -10,10 +11,49 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- task: SSH@0
+  displayName: 'generate backup file'
+  inputs:
+    sshEndpoint: 's36-ssh'
+    runOptions: 'commands'
+    commands: 'cd /usr/local/mcsmanager/backupHelper;./backup_world.sh bedrock_server'
+    readyTimeout: '20000'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- task: CmdLine@2
+  displayName: 'download backup file'
+  inputs:
+    script: 'wget https://ws36.tc0.in/backupHelper/backup.tar.gz'
+    workingDirectory: '$(Build.ArtifactStagingDirectory)'
+
+- task: SSH@0
+  displayName: 'delete backup file'
+  inputs:
+    sshEndpoint: 's36-ssh'
+    runOptions: 'commands'
+    commands: 'rm -f /usr/local/mcsmanager/backupHelper/worlds.tar.gz'
+    failOnStdErr: false
+    readyTimeout: '20000'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'publish artifact'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+
+- task: GitHubRelease@1
+  inputs:
+    gitHubConnection: 'tcrelease'
+    repositoryName: 'tony-cloud/mc-backup'
+    action: 'create'
+    target: '$(Build.SourceVersion)'
+    tagSource: 'userSpecifiedTag'
+    tag: '$(Build.SourceBranchName)-$(Build.SourceVersion)'
+    title: '$(date:yyyyMMddHHmmss)'
+    releaseNotesSource: 'inline'
+    releaseNotesInline: |
+      Build by azure pipeline automatically.
+      No release log specified.
+    assets: '$(Build.ArtifactStagingDirectory)/*.tar.gz'
+    isDraft: true
+    isPreRelease: true
+    addChangeLog: false
